@@ -1,0 +1,27 @@
+{
+	"name": "preact-van",
+	"version": "1.0.0",
+	"description": "Pwa navigation handler",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"ship": "rm -rf ./dist && tsc && npm publish",
+		"build": "rm -rf ./dist && tsc"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com/react-soa/preact-van.git"
+	},
+	"author": "Aryan Alikhani",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/react-soa/preact-van/issues"
+	},
+	"homepage": "https://github.com/react-soa/preact-van#readme",
+	"dependencies": {
+		"preact": "^10.4.6"
+	},
+	"devDependencies": {
+		"typescript": "^3.9.7"
+	}
+}
