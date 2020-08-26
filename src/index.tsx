@@ -5,7 +5,6 @@ import {EventBus} from "./event-bus";
 
 export type Blueprint = {
     name: string;
-    type: 'experiment' | 'flow';
     experiment: string;
     variant: string;
     back: string;
@@ -130,7 +129,6 @@ export function Route(props: {
     const nav = useContext(VanContext);
     nav.metadata.blueprints.push({
         name: props.name,
-        type: context.type,
         experiment: context.experiment,
         variant: context.variant,
         back: props.back,
@@ -184,13 +182,14 @@ class Handler extends Component {
             const [idx, current] = findBlueprint(context, context.head);
             let prev = context.head;
             const memory = context.metadata.memory;
-
             function swap(found: Blueprint) {
                 if (idx > -1 && !found.root) {
                     memory.history = memory.history || {};
                     memory.history[found.name] = current.name;
-                    memory.flow = memory.flow || {};
-                    memory.flow[current.experiment] = current.name;
+                    if(found.experiment !== current.experiment) {
+                        memory.flow = memory.flow || {};
+                        memory.flow[found.experiment] = current.name;
+                    }
                 }
             }
 
@@ -244,30 +243,11 @@ class Handler extends Component {
                     context.metadata.publish('close', dynamicMetadata(current.metadata));
                     return;
                 }
-                if (current.type === 'flow') {
-                    if (typeof current.back !== 'undefined') {
-                        const [idx, blueprint] = findBlueprint(context, current.back);
-                        if (idx > -1) {
-                            prev = blueprint.name;
-                        }
-                    } else {
-                        const currentFlow = context.metadata.blueprints.filter(a => a.experiment === current.experiment && a.variant === current.variant);
-                        const idx = currentFlow.findIndex(a => a.name === current.name);
-                        if (idx === 0) {
-                            if (memory.flow && memory.flow[current.experiment]) {
-                                prev = memory.flow[current.experiment];
-                            }
-                        } else if (idx > 0) {
-                            prev = currentFlow[idx - 1].name;
-                        }
-                    }
-                } else if (current.type === 'experiment') {
-                    if (memory.history && memory.history[current.name]) {
-                        prev = memory.history[current.name];
-                    }
-                    if (typeof current.back !== 'undefined') {
-                        prev = current.back;
-                    }
+                if (memory.history && memory.history[current.name]) {
+                    prev = memory.history[current.name];
+                }
+                if (typeof current.back !== 'undefined') {
+                    prev = current.back;
                 }
                 if (prev) {
                     const [idx, blueprint] = findBlueprint(context, prev);
